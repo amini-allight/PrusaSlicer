@@ -1,0 +1,32 @@
+name: Build goo-format-support-dev for windows
+run-name: Build goo-format-support-dev for windows ${{ github.sha }}
+on: [push, workflow_dispatch]
+env:
+  release_upload_url: https://uploads.github.com/repos/Felix-Rm/PrusaSlicer/releases/143171771/assets{?name,label}
+  modification_time: ${{ github.event.repository.updated_at }}
+jobs:
+  main:
+    name: Build and upload assets
+    runs-on: windows-latest
+    steps:
+      - name: Set asset name
+        shell: powershell
+        run: "\"asset_name=build-windows-\" + (Get-Date \"${{ env.modification_time }}\" -Format \"yyyy.MM.dd-HH.mm.ss\") + \".zip\" | Out-File -FilePath $env:GITHUB_ENV -Append"
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Build PrusaSlicer
+        shell: cmd
+        run: windows_build.bat
+        continue-on-error: true #script seems to also exit with code 1 on success
+      - name: Zip generated files
+        shell: powershell
+        run: Compress-Archive build_windows/bin "${{ env.asset_name }}" 
+      - name: Upload new build
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.release_upload_url }}
+          asset_path: ${{ env.asset_name }}
+          asset_name: ${{ env.asset_name }}
+          asset_content_type: application/zip

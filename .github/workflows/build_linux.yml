@@ -1,0 +1,30 @@
+name: Build goo-format-support-dev for linux
+run-name: Build goo-format-support-dev for linux ${{ github.sha }}
+on: [push, workflow_dispatch]
+env:
+  release_upload_url: https://uploads.github.com/repos/Felix-Rm/PrusaSlicer/releases/143171771/assets{?name,label}
+  modification_time: ${{ github.event.repository.updated_at }}
+jobs:
+  main:
+    name: Build and upload assets
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Set asset name
+        run: "echo \"${{ env.modification_time }}\" | sed -r \"s/\\./:/g\" | date \"+asset_name=linux-build-%Y.%m.%d-%H.%M.%S.zip\" -f - >> $GITHUB_ENV"
+      - name: Install needed libs
+        run: sudo apt-get install -y libglu1-mesa-dev libgtk-3-dev libdbus-1-dev ninja-build
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Build PrusaSlicer
+        run: ./linux_build.sh
+      - name: Zip generated files
+        run: zip -r "${{ env.asset_name }}" build_linux/bin
+      - name: Upload new build
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.release_upload_url }}
+          asset_path: ${{ env.asset_name }}
+          asset_name: ${{ env.asset_name }}
+          asset_content_type: application/zip
