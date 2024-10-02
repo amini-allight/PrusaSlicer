@@ -14,16 +14,26 @@ jobs:
       upstream_repo: prusa3d/PrusaSlicer
       upstream_ref: latest:release
       downstream_repo: Felix-Rm/PrusaSlicer
-      downstream_feature_branches: 'goo-format-support-dev'
+      downstream_feature_branches: 'goo-format-support-dev;elegoo-sla-printer-configs'
       release_tag_prefix: 'autobuild_'
       release_name_prefix: 'Autobuild for Release of '
       release_body_prefix: |
         This is an autobuild release of PrusaSlicer.
         There are no guarantees that this build is stable, no additional testing has been done.
-        &nbsp;
+        
         The PrusaSlicer builds attached below include the following extras:
           - Support for generating .goo files (from goo-format-support-dev branch)
-        &nbsp;
+          - Printer configs for the following Elegoo SLA printers (from elegoo-sla-printer-configs branch):
+            - Elegoo Mars 4 9K
+            - Elegoo Mars 4 DLP
+            - Elegoo Mars 4 Max 6K
+            - Elegoo Mars 4 Ultra 9K
+            - Elegoo Saturn 3 Ultra
+        
+        The additional printer configs are experimental and may require some tweaking to work properly.
+        So please make sure to double check the printer and material settings are correct for your setup before starting a print.
+        If you experience any problems with the added features, please feel free to open an issue on this repository.
+        
         Please note that the attached source archives do not contain the source code of the extras as they are kept seperately on the feature branches listed above.
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
